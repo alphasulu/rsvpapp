@@ -9,13 +9,13 @@ stage('test') {
 node() {
     checkout scm
     stage('build the image') {
-        withDockerServer([credentialsId: 'dockerhost', uri: "tcp://${DOCKERHOST}"]) {
+        withDockerServer([credentialsId: 'dockerhost', uri: "tcp://${DOCKERHOST}:2376"]) {
             docker.build 'akhamsa/rsvpapp:mooc'
         }
     }
     
     stage('push the image to DockerHub') {
-        withDockerServer([credentialsId: 'dockerhost', uri: "tcp://${DOCKERHOST}"]) {
+        withDockerServer([credentialsId: 'dockerhost', uri: "tcp://${DOCKERHOST}:2376"]) {
             withDockerRegistry([credentialsId: 'dockerhub_auth']) {
                 docker.image('akhamsa/rsvpapp:mooc').push()
             }
@@ -23,12 +23,12 @@ node() {
     }
     
     stage('deploy the image to staging server') {
-        withDockerServer([credentialsId: 'staging remote connection', uri: "tcp://${STAGEHOST}"]){
+        withDockerServer([credentialsId: 'staging remote connection', uri: "tcp://${STAGEHOST}:2376"]){
             sh 'docker-compose pull'
             sh 'docker-compose -p rsvp_staging up -d'
     }
-    input "Check application running at http://${STAGEHOST} Looks good?"
-        withDockerServer([credentialsId: 'staging remote connection', uri:"tcp://${STAGEHOST}"]) {
+    input "Check application running at http://${STAGEHOST}:5000 Looks good?"
+        withDockerServer([credentialsId: 'staging remote connection', uri:"tcp://${STAGEHOST}:2376"]) {
             sh 'docker-compose -p rsvp_staging down -v'
         }
     }
@@ -38,7 +38,7 @@ node() {
         "tcp://${DEPLOYHOST}"]) {
         sh 'docker stack deploy -c docker-stack.yaml myrsvpapp'
         }
-        input "Check application running at http://${DEPLOYHOST}"
+        input "Check application running at http://${DEPLOYHOST}:5000"
         withDockerServer([credentialsId: 'production', uri:
         "tcp://${DEPLOYHOST}"]) {
         sh 'docker stack down myrsvpapp'
