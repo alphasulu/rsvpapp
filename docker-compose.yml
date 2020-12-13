@@ -12,7 +12,7 @@ services:
     - rsvpnet
 
  web:
-   image: akhamsa/rsvpapp:mooc
+   image: akhamsa/rsvpapp:debug
    ports:
     - "5000:5000"
     - "9000:9000"
