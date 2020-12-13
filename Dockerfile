@@ -6,5 +6,7 @@ ENV TEXT1 CloudYuga
 ENV TEXT2 Garage RSVP!
 ENV LOGO https://raw.githubusercontent.com/cloudyuga/rsvpapp/master/static/cloudyuga.png
 ENV COMPANY CloudYuga Technology Pvt. Ltd.
+RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
-CMD python rsvp.py
+RUN pip3 install ptvsd
+CMD python -m ptvsd --host 0.0.0.0 --port 9000 rsvp.py
