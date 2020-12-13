@@ -35,12 +35,12 @@ node() {
     
     stage('deploy in production'){
         withDockerServer([credentialsId: 'production', uri:
-        "tcp://${DEPLOYHOST}"]) {
+        "tcp://${DEPLOYHOST}:2376"]) {
         sh 'docker stack deploy -c docker-stack.yaml myrsvpapp'
         }
         input "Check application running at http://${DEPLOYHOST}:5000"
         withDockerServer([credentialsId: 'production', uri:
-        "tcp://${DEPLOYHOST}"]) {
+        "tcp://${DEPLOYHOST}:2376"]) {
         sh 'docker stack down myrsvpapp'
         }
     }
